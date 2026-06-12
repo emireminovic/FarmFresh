@@ -15,7 +15,9 @@ public class MappingProfile : Profile
         CreateMap<OpenFarmEvent, OpenFarmEventDto>();
         CreateMap<CsaSubscription, CsaSubscriptionDto>();
         CreateMap<CsaWeeklyBox, CsaWeeklyBoxDto>();
+        CreateMap<CsaWeeklyBoxItem, CsaWeeklyBoxItemDtoModel>();
         CreateMap<CsaBoxTemplate, CsaBoxTemplateDto>();
+        CreateMap<CsaBoxTemplateItem, CsaBoxTemplateItemDtoModel>();
         CreateMap<Recipe, RecipeDto>();
         CreateMap<Review, ReviewDto>();
         CreateMap<Order, OrderDto>();
