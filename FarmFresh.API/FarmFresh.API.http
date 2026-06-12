@@ -1,0 +1,6 @@
+@FarmFresh.API_HostAddress = http://localhost:5223
+
+GET {{FarmFresh.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
