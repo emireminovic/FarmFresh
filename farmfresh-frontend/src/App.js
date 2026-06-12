@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API = "http://localhost:5223/api/v1";
+const API = "https://farmfresh-production-d270.up.railway.app/api/v1";
 
 const token = () => localStorage.getItem("token");
 const getPreferredUnits = () => {
