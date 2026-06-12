@@ -54,10 +54,5 @@ public class AuthController : ControllerBase
         return Ok(new { success = true });
     }
 
-    [HttpPost("create-admin")]
-public async Task<IActionResult> CreateAdmin()
-{
-    var id = await _mediator.Send(new RegisterCommand("admin@farmfresh.com", "Admin123!", "Admin"));
-    return Ok(new { id });
-}
+
 }
