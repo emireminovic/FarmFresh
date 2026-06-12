@@ -13,14 +13,14 @@ public class UploadsController : ControllerBase
     private readonly Cloudinary _cloudinary;
 
     public UploadsController(IConfiguration configuration)
-    {
-        var account = new Account(
-            configuration["Cloudinary__CloudName"],
-            configuration["Cloudinary__ApiKey"],
-            configuration["Cloudinary__ApiSecret"]
-        );
-        _cloudinary = new Cloudinary(account);
-    }
+{
+    var cloudName = configuration["Cloudinary__CloudName"] ?? Environment.GetEnvironmentVariable("Cloudinary__CloudName");
+    var apiKey = configuration["Cloudinary__ApiKey"] ?? Environment.GetEnvironmentVariable("Cloudinary__ApiKey");
+    var apiSecret = configuration["Cloudinary__ApiSecret"] ?? Environment.GetEnvironmentVariable("Cloudinary__ApiSecret");
+    
+    var account = new Account(cloudName, apiKey, apiSecret);
+    _cloudinary = new Cloudinary(account);
+}
 
     [HttpPost("product-image")]
     [Authorize(Roles = "Farmer")]
