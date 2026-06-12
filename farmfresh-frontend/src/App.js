@@ -356,7 +356,7 @@ function AddProduct() {
       });
       const data = await res.json();
       if (data.url) {
-        setForm(prev => ({ ...prev, imageUrl: `http://localhost:5223${data.url}` }));
+        setForm(prev => ({ ...prev, imageUrl: data.url }));
       } else {
         setMsg("Greška pri uploadu: " + JSON.stringify(data));
       }
