@@ -3159,8 +3159,8 @@ export default function App() {
         {role === "Customer" && <button style={s.navBtn} onClick={() => setPage("customerProfile")}>👤 Moj profil</button>}
         {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("myProducts")}>📦 Moji proizvodi</button>}
         <button style={s.navBtn} onClick={() => setPage("cart")}>🛒 Korpa ({cart.length})</button>
-        <button style={s.navBtn} onClick={() => setPage("myOrders")}>📋 Moje porudžbine</button>
-        {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("farmerOrders")}>📋 Moje porudžbine</button>}
+        {role === "Customer" && <button style={s.navBtn} onClick={() => setPage("myOrders")}>📋 Moje porudžbine</button>}
+        {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("farmerOrders")}>📋 Porudžbine kupaca</button>}
         <button style={s.navBtn} onClick={() => setPage("csa")}>CSA kutija</button>
         <button style={s.navBtn} onClick={() => setPage("openFarm")}>Open Farm</button>
         <button style={s.navBtn} onClick={() => setPage("recipes")}>🍽 Recepti</button>
