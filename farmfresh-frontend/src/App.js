@@ -3092,14 +3092,10 @@ function FarmerOrders() {
                   {o.status || "Nova"}
                 </span>
               </div>
-              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div style={{ marginTop: 12 }}>
                 <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 12 }}>
                   <p style={{ margin: "0 0 4px", fontSize: 11, color: "#888", fontWeight: 600 }}>UKUPNO</p>
                   <p style={{ margin: 0, fontWeight: 600 }}>{o.totalAmount} RSD</p>
-                </div>
-                <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 12 }}>
-                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#888", fontWeight: 600 }}>DATUM</p>
-                  <p style={{ margin: 0, fontWeight: 600 }}>{new Date(o.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             </div>
