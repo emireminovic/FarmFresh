@@ -200,6 +200,7 @@ function Register({ onBack }) {
 }
 
 function Products({ cart, setCart, currency }) {
+   const role = getRole();
   const [products, setProducts] = useState([]);
   const [farmers, setFarmers] = useState({});
   const [filter, setFilter] = useState("");
@@ -313,7 +314,7 @@ function Products({ cart, setCart, currency }) {
             </span>
             {p.availableFrom && p.status === "Coming-soon" && <p style={{ fontSize: 12, color: "#856404" }}>📅 Dostupno od: {new Date(p.availableFrom).toLocaleDateString()}</p>}
             {p.note && <p style={{ fontStyle: "italic", fontSize: 13 }}>📝 {p.note}</p>}
-            {p.status === "Available" && <button style={{ ...s.btn, marginTop: "auto" }} onClick={() => addToCart(p)}>+ Dodaj u korpu</button>}
+           {p.status === "Available" && role !== "Farmer" && <button style={{ ...s.btn, marginTop: "auto" }} onClick={() => addToCart(p)}>+ Dodaj u korpu</button>}
             {p.status !== "Available" && <button style={{ ...s.btn, marginTop: "auto", background: "#aaa", cursor: "not-allowed" }} disabled>Nije dostupno</button>}
           </div>
         ))}
@@ -3158,7 +3159,7 @@ export default function App() {
         {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("farmerProfile")}>🌾 Moj profil</button>}
         {role === "Customer" && <button style={s.navBtn} onClick={() => setPage("customerProfile")}>👤 Moj profil</button>}
         {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("myProducts")}>📦 Moji proizvodi</button>}
-        <button style={s.navBtn} onClick={() => setPage("cart")}>🛒 Korpa ({cart.length})</button>
+        {role === "Customer" && <button style={s.navBtn} onClick={() => setPage("cart")}>🛒 Korpa ({cart.length})</button>}
         {role === "Customer" && <button style={s.navBtn} onClick={() => setPage("myOrders")}>📋 Moje porudžbine</button>}
         {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("farmerOrders")}>📋 Porudžbine kupaca</button>}
         <button style={s.navBtn} onClick={() => setPage("csa")}>CSA kutija</button>
