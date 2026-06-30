@@ -9,7 +9,6 @@ public class Order
     public string DeliveryType { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public string Currency { get; set; } = "RSD";
-
     public CustomerProfile CustomerProfile { get; set; } = null!;
     public ICollection<SubOrder> SubOrders { get; set; } = new List<SubOrder>();
 }

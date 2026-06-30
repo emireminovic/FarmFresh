@@ -3035,6 +3035,82 @@ function MyProducts() {
   );
 }
 
+function FarmerOrders() {
+  const [subOrders, setSubOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getUserId = () => {
+    try {
+      return JSON.parse(atob(localStorage.getItem("token").split(".")[1]))
+        ["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+    } catch { return null; }
+  };
+
+  useEffect(() => {
+    const userId = getUserId();
+    if (!userId) return;
+
+    fetch(`${API}/profiles/farmer/${userId}`, { headers: headers() })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.id) {
+          return fetch(`${API}/orders/farmer/${data.id}`, { headers: headers() });
+        }
+      })
+      .then(r => r?.json())
+      .then(data => {
+        if (Array.isArray(data)) setSubOrders(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={s.page}><p>Učitavanje...</p></div>;
+
+  return (
+    <div style={s.page}>
+      <h2>📋 Moje porudžbine</h2>
+      {subOrders.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 48, color: "#888" }}>
+          <p style={{ fontSize: 40 }}>📦</p>
+          <p>Nemate primljenih porudžbina.</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {subOrders.map(o => (
+            <div key={o.id} style={{ background: "white", borderRadius: 12, padding: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", borderLeft: "4px solid #2d6a4f" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: 16 }}>
+                    Porudžbina #{o.id?.slice(0, 8)}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 13, color: "#888" }}>
+                    Tip dostave: {o.deliveryType}
+                  </p>
+                </div>
+                <span style={{ background: "#d4edda", color: "#155724", padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: 600 }}>
+                  {o.status || "Nova"}
+                </span>
+              </div>
+              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 12 }}>
+                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#888", fontWeight: 600 }}>UKUPNO</p>
+                  <p style={{ margin: 0, fontWeight: 600 }}>{o.totalAmount} RSD</p>
+                </div>
+                <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 12 }}>
+                  <p style={{ margin: "0 0 4px", fontSize: 11, color: "#888", fontWeight: 600 }}>DATUM</p>
+                  <p style={{ margin: 0, fontWeight: 600 }}>{new Date(o.createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 
 
 
@@ -3088,6 +3164,7 @@ export default function App() {
         {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("myProducts")}>📦 Moji proizvodi</button>}
         <button style={s.navBtn} onClick={() => setPage("cart")}>🛒 Korpa ({cart.length})</button>
         <button style={s.navBtn} onClick={() => setPage("myOrders")}>📋 Moje porudžbine</button>
+        {role === "Farmer" && <button style={s.navBtn} onClick={() => setPage("farmerOrders")}>📋 Moje porudžbine</button>}
         <button style={s.navBtn} onClick={() => setPage("csa")}>CSA kutija</button>
         <button style={s.navBtn} onClick={() => setPage("openFarm")}>Open Farm</button>
         <button style={s.navBtn} onClick={() => setPage("recipes")}>🍽 Recepti</button>
@@ -3106,6 +3183,7 @@ export default function App() {
       {page === "myProducts" && <MyProducts />}
       {page === "cart" && <Cart cart={cart} setCart={setCart} currency={currency} />}
       {page === "myOrders" && <MyOrders />}
+      {page === "farmerOrders" && <FarmerOrders />}
       {page === "csa" && <CSA />}
       {page === "openFarm" && <OpenFarmEvents />}
       {page === "recipes" && <Recipes />}
