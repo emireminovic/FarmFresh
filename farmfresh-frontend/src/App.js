@@ -944,7 +944,7 @@ function OpenFarmEvents() {
       });
       const data = await res.json();
       if (data.url) {
-        setReviewForm(prev => ({ ...prev, photoUrl: `http://localhost:5223${data.url}` }));
+        setReviewForm(prev => ({ ...prev, photoUrl: data.url }));
         setReviewMsg("✅ Fotografija uploadovana!");
       } else {
         setReviewMsg("❌ Greška pri uploadu.");
