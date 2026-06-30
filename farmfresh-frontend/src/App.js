@@ -3179,7 +3179,7 @@ export default function App() {
       {page === "myProducts" && <MyProducts />}
       {page === "cart" && <Cart cart={cart} setCart={setCart} currency={currency} />}
       {page === "myOrders" && <MyOrders />}
-      {page === "farmerOrders" && <FarmerOrder/>}
+      {page === "farmerOrders" && <FarmerOrders/>}
       {page === "csa" && <CSA />}
       {page === "openFarm" && <OpenFarmEvents />}
       {page === "recipes" && <Recipes />}
