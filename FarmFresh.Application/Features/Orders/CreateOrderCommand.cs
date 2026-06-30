@@ -47,17 +47,35 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
             await _unitOfWork.SaveChangesAsync();
         }
 
+        
+        decimal rate = 1m;
+        if (request.Currency != "RSD")
+        {
+            var exchangeRates = await _unitOfWork.Repository<ExchangeRate>().GetAllAsync();
+            var rateEntity = exchangeRates.FirstOrDefault(r => r.ToCurrency == request.Currency);
+            if (rateEntity != null)
+                rate = rateEntity.Rate;
+            else
+                rate = request.Currency == "EUR" ? 0.0085m : request.Currency == "USD" ? 0.0092m : 1m;
+        }
+
+        
+        var itemsInRsd = request.Items.Select(i => i with
+        {
+            UnitPrice = Math.Round(i.UnitPrice / rate, 2)
+        }).ToList();
+
         var order = new Order
         {
             Id = Guid.NewGuid(),
             CustomerProfileId = profile.Id,
             DeliveryType = request.DeliveryType,
-            Currency = request.Currency,
+            Currency = "RSD",
             Status = "Pending",
-            TotalAmount = request.Items.Sum(i => i.Quantity * i.UnitPrice)
+            TotalAmount = itemsInRsd.Sum(i => i.Quantity * i.UnitPrice)
         };
 
-        var subOrders = request.Items
+        var subOrders = itemsInRsd
             .GroupBy(i => i.FarmerProfileId)
             .Select(g => new SubOrder
             {

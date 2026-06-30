@@ -3035,7 +3035,7 @@ function MyProducts() {
   );
 }
 
-function FarmerOrders({ currency }) {
+function FarmerOrders() {
   const [subOrders, setSubOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -3054,7 +3054,7 @@ function FarmerOrders({ currency }) {
       .then(r => r.json())
       .then(data => {
         if (data?.id) {
-          return fetch(`${API}/orders/farmer/${data.id}`, { headers: headers(currency) });
+          return fetch(`${API}/orders/farmer/${data.id}`, { headers: headers() });
         }
       })
       .then(r => r?.json())
@@ -3063,7 +3063,7 @@ function FarmerOrders({ currency }) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [currency]);
+  }, []);
 
   if (loading) return <div style={s.page}><p>Učitavanje...</p></div>;
 
@@ -3095,7 +3095,7 @@ function FarmerOrders({ currency }) {
               <div style={{ marginTop: 12 }}>
                 <div style={{ background: "#f8f9fa", borderRadius: 8, padding: 12 }}>
                   <p style={{ margin: "0 0 4px", fontSize: 11, color: "#888", fontWeight: 600 }}>UKUPNO</p>
-                  <p style={{ margin: 0, fontWeight: 600 }}>{o.totalAmount} {currency}</p>
+                  <p style={{ margin: 0, fontWeight: 600 }}>{o.totalAmount} RSD</p>
                 </div>
               </div>
             </div>
@@ -3179,7 +3179,7 @@ export default function App() {
       {page === "myProducts" && <MyProducts />}
       {page === "cart" && <Cart cart={cart} setCart={setCart} currency={currency} />}
       {page === "myOrders" && <MyOrders />}
-      {page === "farmerOrders" && <FarmerOrders currency={currency} />}
+      {page === "farmerOrders" && <FarmerOrder/>}
       {page === "csa" && <CSA />}
       {page === "openFarm" && <OpenFarmEvents />}
       {page === "recipes" && <Recipes />}
