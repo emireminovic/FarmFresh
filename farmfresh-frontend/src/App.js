@@ -548,18 +548,18 @@ function Cart({ cart, setCart, currency }) {
         {confirmation.items.map(c => (
           <div key={c.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #eee" }}>
             <span>{c.name} × {c.qty}</span>
-            <strong>{(c.price * c.qty * rates[confirmation.currency]).toFixed(2)} {confirmation.currency}</strong>
+            <strong>{(c.price * c.qty).toFixed(2)} {confirmation.currency}</strong>
           </div>
         ))}
         {confirmation.deliveryType === "HomeDelivery" && (
           <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #eee" }}>
             <span>🚚 Naknada za dostavu</span>
-            <strong>{(300 * rates[confirmation.currency]).toFixed(2)} {confirmation.currency}</strong>
+            <strong>300.00 {confirmation.currency}</strong>
           </div>
         )}
         <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", fontSize: 18 }}>
           <strong>Ukupno:</strong>
-          <strong style={{ color: "#2d6a4f" }}>{(confirmation.total * rates[confirmation.currency]).toFixed(2)} {confirmation.currency}</strong>
+          <strong style={{ color: "#2d6a4f" }}>{confirmation.total.toFixed(2)} {confirmation.currency}</strong>
         </div>
         <p>🚚 Dostava: {confirmation.deliveryType === "FarmPickup" ? "Lično preuzimanje na farmi" : confirmation.deliveryType === "DropPoint" ? "Drop point" : "Kućna dostava"}</p>
         {confirmation.slot && (
@@ -589,11 +589,11 @@ function Cart({ cart, setCart, currency }) {
         <>
           {cart.map(c => (
             <div key={c.id} style={{ ...s.productCard, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <div><strong>{c.name}</strong> × {c.qty} = {(c.price * c.qty * rates[currency]).toFixed(2)} {currency}</div>
+              <div><strong>{c.name}</strong> × {c.qty} = {(c.price * c.qty).toFixed(2)} {currency}</div>
               <button onClick={() => removeFromCart(c.id)} style={{ background: "#dc3545", color: "white", border: "none", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>×</button>
             </div>
           ))}
-          <p style={{ fontSize: 18 }}><strong>Ukupno: {(total * rates[currency]).toFixed(2)} {currency}</strong></p>
+          <p style={{ fontSize: 18 }}><strong>Ukupno: {total.toFixed(2)} {currency}</strong></p>
 
           <select style={{ ...s.input, width: 300 }} value={deliveryType} onChange={e => setDeliveryType(e.target.value)}>
             <option value="FarmPickup">Lično preuzimanje na farmi</option>
@@ -645,12 +645,12 @@ function Cart({ cart, setCart, currency }) {
               <input style={s.input} placeholder="Grad *" value={address.city} onChange={e => setAddress({...address, city: e.target.value})} />
               <input style={s.input} placeholder="Poštanski broj" value={address.postal} onChange={e => setAddress({...address, postal: e.target.value})} />
               <input style={s.input} placeholder="Broj telefona *" value={address.phone} onChange={e => setAddress({...address, phone: e.target.value})} />
-              <p style={{ fontSize: 13, color: "#666", margin: 0 }}>🚚 Naknada za dostavu: {(300 * rates[currency]).toFixed(2)} {currency}</p>
+              <p style={{ fontSize: 13, color: "#666", margin: 0 }}>🚚 Naknada za dostavu: 300.00 {currency}</p>
             </div>
           )}
 
           {deliveryType === "HomeDelivery" && (
-            <p style={{ fontSize: 16 }}><strong>Ukupno sa dostavom: {((total + deliveryFee) * rates[currency]).toFixed(2)} {currency}</strong></p>
+            <p style={{ fontSize: 16 }}><strong>Ukupno sa dostavom: {(total + deliveryFee).toFixed(2)} {currency}</strong></p>
           )}
 
           <button style={s.btn} onClick={order}>Naruči</button>
@@ -660,7 +660,7 @@ function Cart({ cart, setCart, currency }) {
   );
 }
 
-// ─── FARMER: Upravljanje delivery slotovima ───
+
 function FarmerDeliverySlots() {
   const [farmerProfileId, setFarmerProfileId] = useState("");
   const [slots, setSlots] = useState([]);
