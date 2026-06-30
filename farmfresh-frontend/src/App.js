@@ -2641,7 +2641,7 @@ function FarmerProfilePage() {
       });
       const data = await res.json();
       if (data.url) {
-        const newPhotos = [...photos, `http://localhost:5223${data.url}`];
+        const newPhotos = [...photos, data.url];
         setPhotos(newPhotos);
         // Automatski sačuvaj photos u profil
         await savePhotos(newPhotos);
