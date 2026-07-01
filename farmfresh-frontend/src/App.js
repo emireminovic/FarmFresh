@@ -2589,8 +2589,6 @@ function FarmerProfilePage() {
   });
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(true);
-  const [photos, setPhotos] = useState([]); // lista URL-ova fotografija
-  const [uploading, setUploading] = useState(false);
   const f = k => e => setForm({ ...form, [k]: e.target.value });
 
   const getUserId = () => {
@@ -2617,72 +2615,11 @@ function FarmerProfilePage() {
             certificates: data.certificates || "",
             isOpenFarm: data.isOpenFarm || false
           });
-          // Učitaj fotografije iz Photos polja (comma-separated URLs)
-          if (data.photos) {
-            setPhotos(data.photos.split(",").filter(Boolean));
-          }
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
-
-  const uploadPhoto = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch(`${API}/uploads/farm-photo`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token()}` },
-        body: formData
-      });
-      const data = await res.json();
-      if (data.url) {
-        const newPhotos = [...photos, data.url];
-        setPhotos(newPhotos);
-        // Automatski sačuvaj photos u profil
-        await savePhotos(newPhotos);
-        setMsg("✅ Fotografija dodana!");
-      } else {
-        setMsg("❌ Greška pri uploadu: " + JSON.stringify(data));
-      }
-    } catch (err) {
-      setMsg("❌ Greška: " + err.message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const removePhoto = async (url) => {
-    const newPhotos = photos.filter(p => p !== url);
-    setPhotos(newPhotos);
-    await savePhotos(newPhotos);
-    setMsg("✅ Fotografija uklonjena.");
-  };
-
-  const savePhotos = async (photoList) => {
-    const userId = getUserId();
-    if (!userId) return;
-    await fetch(`${API}/profiles/farmer`, {
-      method: "POST",
-      headers: headers(),
-      body: JSON.stringify({
-        userId,
-        farmName: form.farmName,
-        description: form.description,
-        location: form.location,
-        latitude: parseFloat(form.latitude) || 0,
-        longitude: parseFloat(form.longitude) || 0,
-        yearsOfWork: parseInt(form.yearsOfWork) || 0,
-        certificates: form.certificates,
-        isOpenFarm: form.isOpenFarm,
-        photos: photoList.join(",")
-      })
-    });
-  };
 
   const submit = async () => {
     const userId = getUserId();
@@ -2701,7 +2638,7 @@ function FarmerProfilePage() {
           yearsOfWork: parseInt(form.yearsOfWork) || 0,
           certificates: form.certificates,
           isOpenFarm: form.isOpenFarm,
-          photos: photos.join(",")
+          photos: ""
         })
       });
       const text = await res.text();
@@ -2745,52 +2682,6 @@ function FarmerProfilePage() {
           <input type="checkbox" checked={form.isOpenFarm} onChange={e => setForm({ ...form, isOpenFarm: e.target.checked })} />
           🚜 Open Farm (posjete dozvoljene)
         </label>
-
-        {/* Fotografije farme */}
-        <div style={{ background: "white", borderRadius: 12, padding: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", marginBottom: 20 }}>
-          <h3 style={{ marginTop: 0, color: "#2d6a4f" }}>📸 Fotografije farme</h3>
-          <p style={{ fontSize: 13, color: "#888", marginBottom: 16 }}>Dodajte fotografije vaše farme koje će kupci vidjeti.</p>
-
-          {/* Grid fotografija */}
-          {photos.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10, marginBottom: 16 }}>
-              {photos.map((url, idx) => (
-                <div key={idx} style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
-                  <img src={url} alt={`Farma ${idx + 1}`}
-                    style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }}
-                    onError={e => { e.target.style.display = "none"; }} />
-                  <button
-                    onClick={() => removePhoto(url)}
-                    style={{ position: "absolute", top: 4, right: 4, background: "rgba(220,53,69,0.9)", color: "white", border: "none", borderRadius: "50%", width: 24, height: 24, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Upload dugme */}
-          <div style={{ border: "2px dashed #c3e6cb", borderRadius: 8, padding: 16, textAlign: "center", background: "#f9fffe" }}>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={uploadPhoto}
-              style={{ display: "none" }}
-              id="farmPhotoUpload"
-            />
-            <label htmlFor="farmPhotoUpload" style={{ cursor: "pointer" }}>
-              {uploading ? (
-                <p style={{ color: "#2d6a4f", margin: 0 }}>⏳ Uploading...</p>
-              ) : (
-                <>
-                  <p style={{ fontSize: 28, margin: "0 0 8px" }}>📷</p>
-                  <p style={{ color: "#2d6a4f", fontWeight: 500, margin: 0 }}>Klikni da dodaš fotografiju</p>
-                  <p style={{ fontSize: 12, color: "#888", margin: "4px 0 0" }}>JPG, PNG, WEBP — max 5MB</p>
-                </>
-              )}
-            </label>
-          </div>
-        </div>
 
         {msg && <p style={{ color: msg.includes("✅") ? "green" : "red" }}>{msg}</p>}
         <button style={s.btn} onClick={submit}>Sačuvaj profil</button>
