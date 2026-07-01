@@ -16,7 +16,7 @@ const headers = (currency = "RSD", units = null) => ({
   "X-Units": units || getPreferredUnits()
 });
 
-const rates = { RSD: 1, EUR: 0.0085, USD: 0.0092 };
+
 
 const getRole = () => {
   try {
