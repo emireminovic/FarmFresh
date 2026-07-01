@@ -2429,12 +2429,12 @@ function AdminPanel() {
       {/* Top 5 najprodavanijih */}
       {top5.length > 0 && (
         <div style={{ background: "white", borderRadius: 12, padding: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", marginBottom: 24 }}>
-          <h3 style={{ margin: "0 0 16px", color: "#2d6a4f" }}>🏆 Top 5 najprodavanijih proizvoda</h3>
+          <h3 style={{ margin: "0 0 16px", color: "#2d6a4f" }}> Top 5 najprodavanijih proizvoda</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {top5.map((s, idx) => (
               <div key={s.productId} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: idx === 0 ? "#fffef0" : "#f8f9fa", borderRadius: 8, border: idx === 0 ? "1px solid #ffc107" : "1px solid #eee" }}>
                 <span style={{ fontSize: 20, minWidth: 32, textAlign: "center" }}>
-                  {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
+                  {idx === 0 ? "1" : idx === 1 ? "2" : idx === 2 ? "3" : `#${idx + 1}`}
                 </span>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: "0 0 2px", fontWeight: 600, fontSize: 14 }}>{s.productName}</p>
