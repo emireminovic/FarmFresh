@@ -15,7 +15,7 @@ public class CurrencyUnitMiddleware
     };
     private static DateTime _lastRefresh = DateTime.MinValue;
 
-    // metric → imperial konverzije: Factor je koliko imperial jedinica ima u 1 metric jedinici
+    
     private static readonly Dictionary<string, (decimal Factor, string NewUnit)> MetricToImperial = new()
     {
         { "kg",    (2.20462m,  "lb")  },
@@ -110,7 +110,7 @@ public class CurrencyUnitMiddleware
             {
                 var lower = key.ToLower();
 
-                // ── Currency conversion ──
+               
                 if ((lower.Contains("price") || lower.Contains("amount") || lower.Contains("total"))
                     && obj[key] is JsonValue val && val.TryGetValue<decimal>(out var amount))
                 {
@@ -120,7 +120,7 @@ public class CurrencyUnitMiddleware
                     obj[key] = Math.Round(amount * rate, 2);
                     obj["currency"] = currency;
                 }
-                // ── Unit conversion (samo za imperial) ──
+                
                 else if (lower == "unit" && units == "imperial"
                     && obj[key] is JsonValue unitVal
                     && unitVal.TryGetValue<string>(out var unitStr)
@@ -140,8 +140,7 @@ public class CurrencyUnitMiddleware
                         }
                     }
 
-                    // ← NOVO: konvertuj cijenu po jedinici (dijeli sa faktorom)
-                    // npr. 280 RSD/kg → 280/2.20462 = 127 RSD/lb
+                   
                     foreach (var pKey in new[] { "price", "unitPrice" })
                     {
                         if (obj[pKey] is JsonValue pVal && pVal.TryGetValue<decimal>(out var price))

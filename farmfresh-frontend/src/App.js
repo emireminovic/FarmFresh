@@ -352,7 +352,7 @@ function AddProduct() {
       formData.append("file", file);
       const res = await fetch(`${API}/uploads/product-image`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token()}` }, // bez Content-Type, browser ga sam setuje za FormData
+        headers: { Authorization: `Bearer ${token()}` }, 
         body: formData
       });
       const data = await res.json();
@@ -2322,11 +2322,13 @@ function AdminPanel() {
   const [exchangeRates, setExchangeRates] = useState([]);
   const [msg, setMsg] = useState("");
   const [rateForm, setRateForm] = useState({ EUR: "", USD: "" });
+  const [productSales, setProductSales] = useState([]);
 
   useEffect(() => {
     loadFarmers();
     loadStats();
     loadRates();
+    loadProductSales();
   }, []);
 
   const loadFarmers = () => {
@@ -2354,6 +2356,13 @@ function AdminPanel() {
           setRateForm(form);
         }
       })
+      .catch(() => {});
+  };
+
+  const loadProductSales = () => {
+    fetch(`${API}/admin/product-sales`, { headers: headers() })
+      .then(r => r.json())
+      .then(data => setProductSales(Array.isArray(data) ? data : []))
       .catch(() => {});
   };
 
@@ -2385,6 +2394,7 @@ function AdminPanel() {
 
   const pendingFarmers = farmers.filter(f => !f.isVerified);
   const verifiedFarmers = farmers.filter(f => f.isVerified);
+  const top5 = productSales.slice(0, 5);
 
   return (
     <div style={s.page}>
@@ -2416,11 +2426,36 @@ function AdminPanel() {
         </div>
       )}
 
+      {/* Top 5 najprodavanijih */}
+      {top5.length > 0 && (
+        <div style={{ background: "white", borderRadius: 12, padding: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", marginBottom: 24 }}>
+          <h3 style={{ margin: "0 0 16px", color: "#2d6a4f" }}>🏆 Top 5 najprodavanijih proizvoda</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {top5.map((s, idx) => (
+              <div key={s.productId} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: idx === 0 ? "#fffef0" : "#f8f9fa", borderRadius: 8, border: idx === 0 ? "1px solid #ffc107" : "1px solid #eee" }}>
+                <span style={{ fontSize: 20, minWidth: 32, textAlign: "center" }}>
+                  {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: "0 0 2px", fontWeight: 600, fontSize: 14 }}>{s.productName}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{s.category}</p>
+                </div>
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{ fontSize: 13, color: "#2d6a4f", fontWeight: 600 }}>{s.totalQuantity} {s.unit}</span>
+                  <span style={{ fontSize: 13, color: "#888" }}>{s.totalRevenue.toLocaleString()} RSD</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Tabovi */}
       <div style={{ display: "flex", borderBottom: "1px solid #e0e0e0", marginBottom: 24 }}>
         {[
           { key: "farms", label: `🌾 Verifikacija farmi (${pendingFarmers.length} na čekanju)` },
           { key: "rates", label: "💱 Kursne liste" },
+          { key: "sales", label: "📊 Prodaja po proizvodu" },
           { key: "codebooks", label: "📋 Šifarnici" },
         ].map(t => (
           <div key={t.key}
@@ -2465,7 +2500,6 @@ function AdminPanel() {
               </div>
             </>
           )}
-
           <h3 style={{ color: "#155724", marginBottom: 12 }}>✅ Verifikovane farme ({verifiedFarmers.length})</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {verifiedFarmers.map(f => (
@@ -2532,34 +2566,54 @@ function AdminPanel() {
         </div>
       )}
 
+      {/* Prodaja po proizvodu */}
+      {tab === "sales" && (
+        <div>
+          <p style={{ color: "#666", fontSize: 14, marginBottom: 20 }}>
+            Ukupna prodaja po proizvodu, sortirano po količini.
+          </p>
+          {productSales.length === 0 ? (
+            <p style={{ color: "#888" }}>Nema podataka o prodaji.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {productSales.map((s, idx) => (
+                <div key={s.productId} style={{ background: "white", borderRadius: 10, padding: 16, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: "#2d6a4f", minWidth: 30 }}>
+                      {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
+                    </span>
+                    <div>
+                      <p style={{ margin: "0 0 2px", fontWeight: 600, fontSize: 15 }}>{s.productName}</p>
+                      <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{s.category}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <div style={{ background: "#f0f9f4", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
+                      <p style={{ margin: "0 0 2px", fontSize: 11, color: "#888", fontWeight: 600 }}>PRODANO</p>
+                      <p style={{ margin: 0, fontWeight: 700, color: "#2d6a4f" }}>{s.totalQuantity} {s.unit}</p>
+                    </div>
+                    <div style={{ background: "#f0f9f4", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
+                      <p style={{ margin: "0 0 2px", fontSize: 11, color: "#888", fontWeight: 600 }}>PRIHOD</p>
+                      <p style={{ margin: 0, fontWeight: 700, color: "#2d6a4f" }}>{s.totalRevenue.toLocaleString()} RSD</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Šifarnici */}
       {tab === "codebooks" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
           {[
-            {
-              title: "📦 Jedinice mere",
-              items: ["kg — kilogram", "komad — komad", "litar — litar", "vez — vez", "gram — gram"]
-            },
-            {
-              title: "💰 Valute",
-              items: ["RSD — Srpski dinar", "EUR — Euro", "USD — Američki dolar"]
-            },
-            {
-              title: "🏷 Sertifikati",
-              items: ["organic — Organski", "bio — Bio sertifikat", "mlado_domacinstvo — Mlado domaćinstvo"]
-            },
-            {
-              title: "🌱 Načini uzgoja",
-              items: ["organski — Organski uzgoj", "konvencionalni — Konvencionalni uzgoj"]
-            },
-            {
-              title: "📋 Kategorije proizvoda",
-              items: ["povrće", "voće", "mlečno", "jaja", "meso", "peciva", "med", "sokovi", "suvo voće"]
-            },
-            {
-              title: "🚚 Tipovi isporuke",
-              items: ["FarmPickup — Lično na farmi", "DropPoint — Drop point", "HomeDelivery — Kućna dostava"]
-            },
+            { title: "📦 Jedinice mere", items: ["kg — kilogram", "komad — komad", "litar — litar", "vez — vez", "gram — gram"] },
+            { title: "💰 Valute", items: ["RSD — Srpski dinar", "EUR — Euro", "USD — Američki dolar"] },
+            { title: "🏷 Sertifikati", items: ["organic — Organski", "bio — Bio sertifikat", "mlado_domacinstvo — Mlado domaćinstvo"] },
+            { title: "🌱 Načini uzgoja", items: ["organski — Organski uzgoj", "konvencionalni — Konvencionalni uzgoj"] },
+            { title: "📋 Kategorije proizvoda", items: ["povrće", "voće", "mlečno", "jaja", "meso", "peciva", "med", "sokovi", "suvo voće"] },
+            { title: "🚚 Tipovi isporuke", items: ["FarmPickup — Lično na farmi", "DropPoint — Drop point", "HomeDelivery — Kućna dostava"] },
           ].map(section => (
             <div key={section.title} style={{ background: "white", borderRadius: 10, padding: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
               <h4 style={{ margin: "0 0 12px", color: "#2d6a4f" }}>{section.title}</h4>

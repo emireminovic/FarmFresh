@@ -52,6 +52,30 @@ public class AdminController : ControllerBase
     }
 
     // Statistike
+    [HttpGet("product-sales")]
+public async Task<IActionResult> GetProductSales()
+{
+    var orderItems = await _unitOfWork.Repository<OrderItem>().GetAllAsync();
+    var products = await _unitOfWork.Repository<Product>().GetAllAsync();
+
+    var sales = orderItems
+        .GroupBy(oi => oi.ProductId)
+        .Select(g => {
+            var product = products.FirstOrDefault(p => p.Id == g.Key);
+            return new {
+                productId = g.Key,
+                productName = product?.Name ?? "Nepoznat proizvod",
+                category = product?.Category ?? "",
+                totalQuantity = g.Sum(oi => oi.Quantity),
+                totalRevenue = g.Sum(oi => oi.Quantity * oi.UnitPrice),
+                unit = product?.Unit ?? ""
+            };
+        })
+        .OrderByDescending(x => x.totalQuantity)
+        .ToList();
+
+    return Ok(sales);
+}
     [HttpGet("stats")]
     public async Task<IActionResult> GetStats()
     {
